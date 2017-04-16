@@ -11,7 +11,6 @@ body {
 .title {
   margin-bottom:1em;
   background:#222;
-  
   padding:1em .5em .5em;
   border-bottom:solid 1px black;
   box-shadow:0 1px 4px black;
@@ -36,6 +35,15 @@ body {
   display:flex;
   justify-content:center;
   align-items:center;
+  cursor:pointer;
+}
+.x-sqr:hover span:before{
+  content:'X';
+  opacity:.2;
+}
+.o-sqr:hover span:before{
+  content:'O';
+  opacity:.2;
 }
 
 .board {
@@ -59,6 +67,12 @@ body {
 .square:nth-child(1n + 7) {
   border-bottom:none;
 }
+.non-clickable {
+  pointer-events:none;
+}
+
+
+
 .scoreboard {
   display:inline-block;
   margin-left:2em;
@@ -67,10 +81,14 @@ body {
 .options {
   margin-bottom:1em;
 }
+.option {
+  margin-top:.5em;
+}
 
 .btn-group {
   margin-left:1em;
 }
+
 .game-start{
   margin-bottom:2em;
 }
