@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+*{box-sizing:border-box}
+
+body {
+  font-size:20px;
+  font-family:'Montserrat', sans-serif;
+  background:#eee;
+}
+
+.title {
+  margin-bottom:1em;
+  background:#222;
+  
+  padding:1em .5em .5em;
+  border-bottom:solid 1px black;
+  box-shadow:0 1px 4px black;
+  color:#61dafb;  
+}
+
+.logo {
+  height:100%;
+  vertical-align:middle;
+}
+.name { 
+  font-size:36px;
+  vertical-align:middle;
+  margin-left:10px;
+}
+
+.square {
+  width:2em;
+  height:2em;
+  border:1px solid gray;
+  margin: -1px -1px 0 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.board {
+  display:inline-flex;
+  flex-wrap:wrap;
+  width:6em; 
+  font-size:2em;
+  margin-bottom:1em;
+  vertical-align: top;
+}
+/*removing outer borders from game board*/
+.square:nth-child(-1n + 3) {
+  border-top:none;
+}
+.square:nth-child(3n + 1) {
+  border-left:none;
+}
+.square:nth-child(3n + 3) {
+  border-right:none;
+}
+.square:nth-child(1n + 7) {
+  border-bottom:none;
+}
+.scoreboard {
+  display:inline-block;
+  margin-left:2em;
+}
+
+.options {
+  margin-bottom:1em;
+}
+
+.btn-group {
+  margin-left:1em;
+}
+.game-start{
+  margin-bottom:2em;
+}
