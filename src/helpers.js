@@ -4,18 +4,18 @@ const AI = {
         console.log('minimaxing');
     },
     potentialState: function(state, pos) {
-        // copy and alter board with AI's mark
-        const squares = state.board.slice();
+        // copy and alter squares with AI's mark
+        const squares = state.squares.slice();
         squares[pos] = state.xTurn ? 'X': 'O';
         // create new future state object
-        return Object.assign({}, state, {board: squares, xTurn: !state.xTurn});
+        return Object.assign({}, state, {squares: squares, xTurn: !state.xTurn});
     }
 }
 
 // game helper functions
 const helpers = {
-    getEmptySquares: function(board) {
-        const empty = board.map((item, index) => {
+    getEmptySquares: function(squares) {
+        const empty = squares.map((item, index) => {
             if (item == null) 
                 return index;
         }).filter(item => item !== undefined);
@@ -46,7 +46,7 @@ const helpers = {
         }
         // check for draw
         if (this.getEmptySquares(squares).length === 0) {
-            return {winner:"Draw"};
+            return {winner:"Draw", squares:[null]};
         }
         // game ongoing
         return null;

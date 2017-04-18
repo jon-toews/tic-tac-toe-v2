@@ -7,7 +7,7 @@ export default class Game extends React.Component {
   constructor() {
     super()
     this.state = {
-      board: Array(9).fill(null),
+      squares: Array(9).fill(null),
       xTurn: true,
       xIsPlayer : true,
       scores : [0,0],
@@ -16,16 +16,30 @@ export default class Game extends React.Component {
     }
   }
   componentDidUpdate() {
-    // make AI action if it is not player's turn and game is started
-    if (this.state.xIsPlayer !==  this.state.xTurn && this.state.started) {
-      console.log('ai action');
-      
-      setTimeout(() => this.AIaction(), 500);
+    // check if game is in terminal state - win or draw
+    const result = helpers.isTerminal(this.state.squares);
+    // if round has a result, update scores and reset board after brief delay
+    if (result) {
+      let scores = this.state.scores.slice();
+
+      if (result.winner === 'X') {
+        scores[0]+=1;
+      } else if (result.winner === 'O') {
+        scores[1]+=1;
+      }
+      // start new round after timeout
+      setTimeout(() => this.setState({
+        squares: Array(9).fill(null),
+        scores:scores
+      }), 1000);
     }
+    // if round ongoing, make AI action if it is not player's turn and game is started 
+    else if (this.state.xIsPlayer !==  this.state.xTurn && this.state.started) {
+      setTimeout(() => this.AIaction(), 500);
+    } 
   }
 
   gameStart() {
-    console.log('starting game');
     this.setState({
       started: true,
     })
@@ -33,13 +47,10 @@ export default class Game extends React.Component {
   gameReset() {
     this.setState({
       started: false,
-      board: Array(9).fill(null),
+      squares: Array(9).fill(null),
       scores: [0,0],
       xTurn: true,
     })
-  }
-  gameEnd() {
-    console.log('game end');
   }
 
   handleOptionChange(opt) {
@@ -58,7 +69,7 @@ export default class Game extends React.Component {
   }
 
   AIaction() {
-    const squares = this.state.board.slice();
+    const squares = this.state.squares.slice();
     // check if game is over
     if (helpers.isTerminal(squares)) {
       this.gameEnd();
@@ -70,13 +81,12 @@ export default class Game extends React.Component {
     const AImove = emptySquares[Math.floor(Math.random() * emptySquares.length)];
 
     const nextState = AI.potentialState(this.state, 0);
-    console.log(this.state);
-    console.log(nextState);
+
 
     squares[AImove] = this.state.xIsPlayer ? "O": "X"; 
     
     this.setState({
-      board:squares,
+      squares:squares,
       xTurn:!this.state.xTurn
     })
   }
@@ -84,7 +94,7 @@ export default class Game extends React.Component {
   handleClick(i) {
     // exit if not human player's turn
     if (this.state.xIsPlayer !== this.state.xTurn) return;
-    const squares = this.state.board.slice();
+    const squares = this.state.squares.slice();
     // check if squared already played
     if (squares[i]) return;
     
@@ -95,12 +105,14 @@ export default class Game extends React.Component {
     squares[i] = this.state.xTurn ? "X": "O";
 
     this.setState({
-      board: squares,
+      squares: squares,
       xTurn: !this.state.xTurn
     })
   }
   
   render() {
+    const result = helpers.isTerminal(this.state.squares);
+
     return (
       <div className="game">
         <Title />
@@ -121,17 +133,17 @@ export default class Game extends React.Component {
               <Board
                 xTurn={this.state.xTurn}
                 xIsPlayer={this.state.xIsPlayer}
-                squares={this.state.board}
+                squares={this.state.squares}
+                result={result}
                 onClick={(i) => this.handleClick(i)}
               />
               <ScoreBoard 
-                squares={this.state.board}
+                result={result}
                 scores={this.state.scores} 
                 xTurn={this.state.xTurn}
               />
             </div>
           }
-          
         </div>
       </div>
     )
@@ -140,6 +152,8 @@ export default class Game extends React.Component {
 class Board extends React.Component {
   render() {
     const playerTurn = this.props.xTurn === this.props.xIsPlayer;
+    const result = this.props.result;
+
     const squares = this.props.squares.map((square, i) => {
       // define css classes for each square
       let classes = "square";
@@ -150,6 +164,11 @@ class Board extends React.Component {
         classes += " x-sqr"
       else
         classes += " o-sqr"
+      if(result) {
+        if(result.squares.indexOf(i) !== -1){
+          classes += " winning-sqr"
+        }
+      }
 
       return (
         <div key={i} className={classes} onClick={() => this.props.onClick(i)}>
@@ -169,11 +188,11 @@ class ScoreBoard extends React.Component {
   render() {
     const xScore = this.props.scores[0];
     const oScore = this.props.scores[1];
- 
+    
     let message = this.props.xTurn ? "X's turn":"O's turn";
 
-    const result = helpers.isTerminal(this.props.squares);
-    
+    // const result = helpers.isTerminal(this.props.squares);
+    const result = this.props.result;
     if (result) {
       if (result.winner === "Draw")
         message = "It's a draw!";
@@ -184,9 +203,9 @@ class ScoreBoard extends React.Component {
     return (
       <div className="scoreboard">
         <span className="status">{message}</span>
-        <ul>
-          <li>X's score: {xScore}</li>
-          <li>O's score: {oScore}</li>
+        <ul className="scores">
+          <li>X's score:  <span>{xScore}</span></li>
+          <li>O's score:  <span>{oScore}</span></li>
         </ul>
       </div>
     )
@@ -220,7 +239,7 @@ class GamePiece extends React.Component {
   render() {
     return (
       <div className="option">
-        <span>Choose your game piece</span>
+        <span>Game piece:</span>
         <div className="btn-group">
           <button 
             className={"btn " + (this.props.mark ? "btn-primary": "btn-secondary")}
@@ -243,7 +262,7 @@ class GamePiece extends React.Component {
 class Difficulty extends React.Component {
   render() {
     return (
-      <div className="option">AI difficulty: 
+      <div className="option">AI difficulty:&nbsp;&nbsp;
         <div className="game-difficulty btn-group">
           <button 
             className={"btn " + (this.props.difficulty==="easy"?"btn-primary":"btn-secondary")}

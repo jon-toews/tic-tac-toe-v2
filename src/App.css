@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat');
+@import url('https://fonts.googleapis.com/css?family=Ranga');
 
 *{box-sizing:border-box}
 
 body {
-  font-size:20px;
+  font-size:16px;
   font-family:'Montserrat', sans-serif;
   background:#eee;
 }
@@ -16,6 +17,9 @@ body {
   box-shadow:0 1px 4px black;
   color:#61dafb;  
 }
+.btn {
+  font-size:.9rem;
+}
 
 .logo {
   height:100%;
@@ -27,6 +31,16 @@ body {
   margin-left:10px;
 }
 
+.board {
+  display:inline-flex;
+  flex-wrap:wrap;
+  width:6em; 
+  font-size:2em;
+  margin-bottom:1em;
+  vertical-align: top;
+  color:rgba(0,0,0,.9);
+}
+
 .square {
   width:2em;
   height:2em;
@@ -36,6 +50,7 @@ body {
   justify-content:center;
   align-items:center;
   cursor:pointer;
+  transition:1s ease-out;
 }
 .x-sqr:hover span:before{
   content:'X';
@@ -45,15 +60,10 @@ body {
   content:'O';
   opacity:.2;
 }
-
-.board {
-  display:inline-flex;
-  flex-wrap:wrap;
-  width:6em; 
-  font-size:2em;
-  margin-bottom:1em;
-  vertical-align: top;
+.winning-sqr{
+  background:hsl(193, 50%, 85%);
 }
+
 /*removing outer borders from game board*/
 .square:nth-child(-1n + 3) {
   border-top:none;
@@ -71,15 +81,33 @@ body {
   pointer-events:none;
 }
 
-
-
 .scoreboard {
   display:inline-block;
   margin-left:2em;
+  color:rgba(0,0,0,.9);
+}
+
+.status {
+  font-size:1.75em;
+}
+.scores{
+  list-style:none;
+  padding:.5em .25em;
+}
+.scores li {
+  margin-top:4px;
+  font-style: italic;
+
+}
+.scores li span {
+  font-style:normal;
+  font-size:1.25rem;
+  color:black; 
 }
 
 .options {
   margin-bottom:1em;
+  font-size:1.25em;
 }
 .option {
   margin-top:.5em;
