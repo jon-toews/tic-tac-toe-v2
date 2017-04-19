@@ -1,6 +1,10 @@
 import React from 'react';
 import './App.css';
-import {AI, helpers} from './helpers.js';
+import helpers from './helpers';
+import AI from './AI';
+import Options from './Components/Options'
+import Board from './Components/Board'
+import ScoreBoard from './Components/ScoreBoard'
 
 
 export default class Game extends React.Component {
@@ -12,7 +16,7 @@ export default class Game extends React.Component {
       xIsPlayer : true,
       scores : [0,0],
       started: false,
-      difficulty: 'easy',
+      difficulty: 'hard',
     }
   }
   componentDidUpdate() {
@@ -31,7 +35,7 @@ export default class Game extends React.Component {
       setTimeout(() => this.setState({
         squares: Array(9).fill(null),
         scores:scores
-      }), 1000);
+      }), 1500);
     }
     // if round ongoing, make AI action if it is not player's turn and game is started 
     else if (this.state.xIsPlayer !==  this.state.xTurn && this.state.started) {
@@ -72,16 +76,16 @@ export default class Game extends React.Component {
     const squares = this.state.squares.slice();
     // check if game is over
     if (helpers.isTerminal(squares)) {
-      this.gameEnd();
+      console.log('WARNING. AI action after game end')
       return;
     }
 
-    const emptySquares = helpers.getEmptySquares(squares);
-    // pick random move
-    const AImove = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+    //  const emptySquares = helpers.getEmptySquares(squares);
+    // // pick random move
+    //  const AImove = emptySquares[Math.floor(Math.random() * emptySquares.length)];
 
-    const nextState = AI.potentialState(this.state, 0);
-
+    const AImove = AI.move(this.state);
+    console.log('best move is ', AImove);
 
     squares[AImove] = this.state.xIsPlayer ? "O": "X"; 
     
@@ -99,7 +103,6 @@ export default class Game extends React.Component {
     if (squares[i]) return;
     
     if (helpers.isTerminal(squares)) {
-      this.gameEnd();
       return;
     }
     squares[i] = this.state.xTurn ? "X": "O";
@@ -149,154 +152,34 @@ export default class Game extends React.Component {
     )
   }
 }
-class Board extends React.Component {
-  render() {
-    const playerTurn = this.props.xTurn === this.props.xIsPlayer;
-    const result = this.props.result;
 
-    const squares = this.props.squares.map((square, i) => {
-      // define css classes for each square
-      let classes = "square";
-      if(square || !playerTurn) {
-        classes +=" non-clickable";
-      }
-      if(this.props.xTurn)
-        classes += " x-sqr"
-      else
-        classes += " o-sqr"
-      if(result) {
-        if(result.squares.indexOf(i) !== -1){
-          classes += " winning-sqr"
-        }
-      }
 
-      return (
-        <div key={i} className={classes} onClick={() => this.props.onClick(i)}>
-          {square}<span></span>
-        </div>
-      )
-    });
-    return (
-      <div className="board">
-        {squares}
-      </div>
-    )
-  }
-}
-
-class ScoreBoard extends React.Component {
-  render() {
-    const xScore = this.props.scores[0];
-    const oScore = this.props.scores[1];
-    
-    let message = this.props.xTurn ? "X's turn":"O's turn";
-
-    // const result = helpers.isTerminal(this.props.squares);
-    const result = this.props.result;
-    if (result) {
-      if (result.winner === "Draw")
-        message = "It's a draw!";
-      else
-        message = result.winner + " wins!";
-    }
-
-    return (
-      <div className="scoreboard">
-        <span className="status">{message}</span>
-        <ul className="scores">
-          <li>X's score:  <span>{xScore}</span></li>
-          <li>O's score:  <span>{oScore}</span></li>
-        </ul>
-      </div>
-    )
-  }
-}
 
 const Title = () => (
   <div className="title">
     <div className="container">
-      <img className="logo" alt="react logo"
-          src="https://raw.githubusercontent.com/jon-toews/tic-tac-toe/styling/public/favicon.ico" /><span className="name">Tic Tac Toe</span>
+      <svg className="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 841.9 595.3">
+        <g fill="#61DAFB">
+          <path d="M666.3 296.5c0-32.5-40.7-63.3-103.1-82.4 14.4-63.6 8-114.2-20.2-130.4-6.5-3.8-14.1-5.6-22.4-5.6v22.3c4.6 0 8.3.9 11.4 2.6 13.6 7.8 19.5 37.5 14.9 75.7-1.1 9.4-2.9 19.3-5.1 29.4-19.6-4.8-41-8.5-63.5-10.9-13.5-18.5-27.5-35.3-41.6-50 32.6-30.3 63.2-46.9 84-46.9V78c-27.5 0-63.5 19.6-99.9 53.6-36.4-33.8-72.4-53.2-99.9-53.2v22.3c20.7 0 51.4 16.5 84 46.6-14 14.7-28 31.4-41.3 49.9-22.6 2.4-44 6.1-63.6 11-2.3-10-4-19.7-5.2-29-4.7-38.2 1.1-67.9 14.6-75.8 3-1.8 6.9-2.6 11.5-2.6V78.5c-8.4 0-16 1.8-22.6 5.6-28.1 16.2-34.4 66.7-19.9 130.1-62.2 19.2-102.7 49.9-102.7 82.3 0 32.5 40.7 63.3 103.1 82.4-14.4 63.6-8 114.2 20.2 130.4 6.5 3.8 14.1 5.6 22.5 5.6 27.5 0 63.5-19.6 99.9-53.6 36.4 33.8 72.4 53.2 99.9 53.2 8.4 0 16-1.8 22.6-5.6 28.1-16.2 34.4-66.7 19.9-130.1 62-19.1 102.5-49.9 102.5-82.3zm-130.2-66.7c-3.7 12.9-8.3 26.2-13.5 39.5-4.1-8-8.4-16-13.1-24-4.6-8-9.5-15.8-14.4-23.4 14.2 2.1 27.9 4.7 41 7.9zm-45.8 106.5c-7.8 13.5-15.8 26.3-24.1 38.2-14.9 1.3-30 2-45.2 2-15.1 0-30.2-.7-45-1.9-8.3-11.9-16.4-24.6-24.2-38-7.6-13.1-14.5-26.4-20.8-39.8 6.2-13.4 13.2-26.8 20.7-39.9 7.8-13.5 15.8-26.3 24.1-38.2 14.9-1.3 30-2 45.2-2 15.1 0 30.2.7 45 1.9 8.3 11.9 16.4 24.6 24.2 38 7.6 13.1 14.5 26.4 20.8 39.8-6.3 13.4-13.2 26.8-20.7 39.9zm32.3-13c5.4 13.4 10 26.8 13.8 39.8-13.1 3.2-26.9 5.9-41.2 8 4.9-7.7 9.8-15.6 14.4-23.7 4.6-8 8.9-16.1 13-24.1zM421.2 430c-9.3-9.6-18.6-20.3-27.8-32 9 .4 18.2.7 27.5.7 9.4 0 18.7-.2 27.8-.7-9 11.7-18.3 22.4-27.5 32zm-74.4-58.9c-14.2-2.1-27.9-4.7-41-7.9 3.7-12.9 8.3-26.2 13.5-39.5 4.1 8 8.4 16 13.1 24 4.7 8 9.5 15.8 14.4 23.4zM420.7 163c9.3 9.6 18.6 20.3 27.8 32-9-.4-18.2-.7-27.5-.7-9.4 0-18.7.2-27.8.7 9-11.7 18.3-22.4 27.5-32zm-74 58.9c-4.9 7.7-9.8 15.6-14.4 23.7-4.6 8-8.9 16-13 24-5.4-13.4-10-26.8-13.8-39.8 13.1-3.1 26.9-5.8 41.2-7.9zm-90.5 125.2c-35.4-15.1-58.3-34.9-58.3-50.6 0-15.7 22.9-35.6 58.3-50.6 8.6-3.7 18-7 27.7-10.1 5.7 19.6 13.2 40 22.5 60.9-9.2 20.8-16.6 41.1-22.2 60.6-9.9-3.1-19.3-6.5-28-10.2zM310 490c-13.6-7.8-19.5-37.5-14.9-75.7 1.1-9.4 2.9-19.3 5.1-29.4 19.6 4.8 41 8.5 63.5 10.9 13.5 18.5 27.5 35.3 41.6 50-32.6 30.3-63.2 46.9-84 46.9-4.5-.1-8.3-1-11.3-2.7zm237.2-76.2c4.7 38.2-1.1 67.9-14.6 75.8-3 1.8-6.9 2.6-11.5 2.6-20.7 0-51.4-16.5-84-46.6 14-14.7 28-31.4 41.3-49.9 22.6-2.4 44-6.1 63.6-11 2.3 10.1 4.1 19.8 5.2 29.1zm38.5-66.7c-8.6 3.7-18 7-27.7 10.1-5.7-19.6-13.2-40-22.5-60.9 9.2-20.8 16.6-41.1 22.2-60.6 9.9 3.1 19.3 6.5 28.1 10.2 35.4 15.1 58.3 34.9 58.3 50.6-.1 15.7-23 35.6-58.4 50.6zM320.8 78.4z"/>
+          <circle cx="420.9" cy="296.5" r="45.7"/>
+          <path d="M520.5 78.1z"/>
+        </g>
+      </svg>
+      <span className="name">Tic Tac Toe</span>
     </div>
   </div> 
 )
 
-class Options extends React.Component {
-  render() {
-    // hide options if game is started
-    if (this.props.started) return null;
-    
-    return (
-      <div className="options">
-        <GamePiece mark={this.props.mark} onClick={(opt) => this.props.onClick(opt)} />
-        <Difficulty difficulty={this.props.difficulty} onClick={(opt) => this.props.onClick(opt)} />
-      </div>
-    )
-  }
-}
 
-class GamePiece extends React.Component {
-  render() {
-    return (
-      <div className="option">
-        <span>Game piece:</span>
-        <div className="btn-group">
-          <button 
-            className={"btn " + (this.props.mark ? "btn-primary": "btn-secondary")}
-            onClick={() => this.props.onClick({type:'piece', value:'X'})}
-          >
-            X's
-          </button>
-          <button
-            className={"btn " + (!this.props.mark? "btn-primary": "btn-secondary")}
-            onClick={() => this.props.onClick({type:'piece', value:'O'})}
-          >
-            O's
-          </button>
-        </div>
-      </div> 
-    )
+const GameStart = props => {
+  let button = null;
+  // show reset button if game is already started
+  if (props.started) {
+    button = <button onClick={() => props.onReset()} className="start btn btn-warning">Restart</button>
+  } else {
+    button = <button onClick={() => props.onStart()} className="reset btn btn-success">Play</button>
   }
+  
+  return (<div className="game-start">{button}</div>)
 }
-
-class Difficulty extends React.Component {
-  render() {
-    return (
-      <div className="option">AI difficulty:&nbsp;&nbsp;
-        <div className="game-difficulty btn-group">
-          <button 
-            className={"btn " + (this.props.difficulty==="easy"?"btn-primary":"btn-secondary")}
-            onClick={() => this.props.onClick({type:'diff', value:'easy'})}
-          >
-            Easy
-          </button>
-          <button 
-            className={"btn " + (this.props.difficulty==="medium"?"btn-primary":"btn-secondary")}
-            onClick={() => this.props.onClick({type:'diff', value:'medium'})}
-          >
-            Medium
-          </button>
-          <button 
-            className={"btn " + (this.props.difficulty==="hard"?"btn-primary":"btn-secondary")}
-            onClick={() => this.props.onClick({type:'diff', value:'hard'})}
-          >
-            Hard
-          </button>
-        </div>
-      </div>
-    )
-  }
-}
-
-class GameStart extends React.Component {
-  render() {
-    let button = null;
-    if (this.props.started) {
-      button = <button onClick={() => this.props.onReset()} className="start btn btn-warning">Restart</button>
-    } else {
-      button = <button onClick={() => this.props.onStart()} className="reset btn btn-success">Play</button>
-    }
-    
-    return (<div className="game-start">{button}</div>)
-  }
-}
+  

@@ -1,17 +1,3 @@
-// AI logic
-const AI = {
-    minimax: function() {
-        console.log('minimaxing');
-    },
-    potentialState: function(state, pos) {
-        // copy and alter squares with AI's mark
-        const squares = state.squares.slice();
-        squares[pos] = state.xTurn ? 'X': 'O';
-        // create new future state object
-        return Object.assign({}, state, {squares: squares, xTurn: !state.xTurn});
-    }
-}
-
 // game helper functions
 const helpers = {
     getEmptySquares: function(squares) {
@@ -46,11 +32,14 @@ const helpers = {
         }
         // check for draw
         if (this.getEmptySquares(squares).length === 0) {
-            return {winner:"Draw", squares:[null]};
+            return {
+                winner:"Draw", 
+                squares:[null]
+            };
         }
         // game ongoing
         return null;
     }
 }
 
-export {AI, helpers}; 
+export default helpers;
